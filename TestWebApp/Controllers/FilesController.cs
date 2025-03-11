@@ -17,6 +17,7 @@ public class FilesController: ControllerBase
     [Route("[action]")]
     public async Task<string> Post()
     {
+        Directory.CreateDirectory("files");
         foreach (var file in Request.Form.Files)
         {
             await SaveFile(file);
