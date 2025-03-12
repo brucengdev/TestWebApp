@@ -23,7 +23,8 @@ Console.WriteLine("Spamming server with POST requests...");
 while (!Console.KeyAvailable)
 {
     var content = new StringContent(stringContent);
-    await client.PostAsync(endpoint, content);
+    var result = await client.PostAsync(endpoint, content);
+    Console.WriteLine("POST to /json/post, status: {0}", result.StatusCode);
 }
 
 Console.WriteLine("Stopped spamming.");

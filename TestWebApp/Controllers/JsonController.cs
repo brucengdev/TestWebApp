@@ -29,8 +29,9 @@ public class JsonController: ControllerBase
         var newFile = "0";
         if (files.Length > 0)
         {
-            Array.Sort(files);
-            newFile = (Convert.ToInt32(files.Last().Split("/")[1]) + 1).ToString();
+            var nextNumber = files.Select(name => Convert.ToInt32(name.Split("/")[1]))
+                .Max() + 1;
+            newFile = nextNumber.ToString();
         }
 
         var json = await (new StreamReader(HttpContext.Request.Body).ReadToEndAsync());
