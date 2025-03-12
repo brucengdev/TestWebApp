@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Net.Http.Json;
 using System.Text;
 
 var client = new HttpClient();
@@ -18,13 +17,26 @@ string GenerateString(int count)
     return sb.ToString();
 }
 
-var stringContent = GenerateString(10000);
+var contentSize = 20 * 1024 * 1024;//20MB
+var stringContent = GenerateString(contentSize);
+var numberOfParallelThreads = 10;
 Console.WriteLine("Spamming server with POST requests...");
 while (!Console.KeyAvailable)
 {
-    var content = new StringContent(stringContent);
-    var result = await client.PostAsync(endpoint, content);
-    Console.WriteLine("POST to /json/post, status: {0}", result.StatusCode);
+    var tasks = new Task[numberOfParallelThreads];
+    for (int i = 0; i < numberOfParallelThreads; i++)
+    {
+        tasks[i] = SendAsync(stringContent, client, endpoint);
+    }
+
+    await Task.WhenAll(tasks);
 }
 
 Console.WriteLine("Stopped spamming.");
+
+async Task SendAsync(string s, HttpClient httpClient, string endpoint1)
+{
+    var content = new StringContent(s);
+    var result = await httpClient.PostAsync(endpoint1, content);
+    Console.WriteLine("POST to /json/post, status: {0}", result.StatusCode);
+}
