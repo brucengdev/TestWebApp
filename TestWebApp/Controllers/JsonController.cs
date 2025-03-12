@@ -22,21 +22,21 @@ public class JsonController: ControllerBase
     
     [HttpPost]
     [Route("[action]")]
-    public string Post()
+    public async Task<string> Post()
     {
         Directory.CreateDirectory("json");
-        var files = Directory.GetFiles("json");
+        var files = Directory.GetFiles("json/");
         var newFile = "0";
         if (files.Length > 0)
         {
             Array.Sort(files);
-            newFile = (Convert.ToInt32(files.Last()) + 1).ToString();
+            newFile = (Convert.ToInt32(files.Last().Split("/")[1]) + 1).ToString();
         }
 
-        var json = new StreamReader(HttpContext.Request.Body).ReadToEnd();
+        var json = await (new StreamReader(HttpContext.Request.Body).ReadToEndAsync());
         var writer = new FileStream("json/" + newFile, FileMode.Create);
         var buffer = Encoding.UTF8.GetBytes(json);
-        writer.Write(buffer);
+        await writer.WriteAsync(buffer);
         writer.Close();
 
         return "Saved";
